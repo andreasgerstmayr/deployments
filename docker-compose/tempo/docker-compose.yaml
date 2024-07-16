@@ -1,0 +1,152 @@
+services:
+  distributor:
+    image: &tempoImage grafana/tempo:latest
+    command: "-target=distributor -config.file=/etc/tempo.yaml"
+    restart: always
+    volumes:
+      - ./tempo-distributed.yaml:/etc/tempo.yaml
+    ports:
+      - "4318:4318"   # otlp-http
+    environment:
+      - JAEGER_AGENT_HOST=distributor
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+
+  ingester-0:
+    image: *tempoImage
+    command: "-target=ingester -config.file=/etc/tempo.yaml"
+    restart: always
+    volumes:
+      - ./tempo-distributed.yaml:/etc/tempo.yaml
+    environment:
+      - JAEGER_AGENT_HOST=distributor
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+
+  ingester-1:
+    image: *tempoImage
+    command: "-target=ingester -config.file=/etc/tempo.yaml"
+    restart: always
+    volumes:
+      - ./tempo-distributed.yaml:/etc/tempo.yaml
+    environment:
+      - JAEGER_AGENT_HOST=distributor
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+
+  ingester-2:
+    image: *tempoImage
+    command: "-target=ingester -config.file=/etc/tempo.yaml"
+    restart: always
+    volumes:
+      - ./tempo-distributed.yaml:/etc/tempo.yaml
+    environment:
+      - JAEGER_AGENT_HOST=distributor
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+
+  query-frontend:
+    image: *tempoImage
+    command: "-target=query-frontend -config.file=/etc/tempo.yaml -log.level=debug"
+    restart: always
+    volumes:
+      - ./tempo-distributed.yaml:/etc/tempo.yaml
+    ports:
+      - "3200:3200"
+    environment:
+      - JAEGER_AGENT_HOST=distributor
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+
+  querier:
+    image: *tempoImage
+    command: "-target=querier -config.file=/etc/tempo.yaml -log.level=debug"
+    restart: always
+    volumes:
+      - ./tempo-distributed.yaml:/etc/tempo.yaml
+    environment:
+      - JAEGER_AGENT_HOST=distributor
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+
+  compactor:
+    image: *tempoImage
+    command: "-target=compactor -config.file=/etc/tempo.yaml"
+    restart: always
+    volumes:
+      - ./tempo-distributed.yaml:/etc/tempo.yaml
+    environment:
+      - JAEGER_AGENT_HOST=distributor
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+
+  metrics-generator:
+    image: *tempoImage
+    command: "-target=metrics-generator -config.file=/etc/tempo.yaml"
+    restart: always
+    volumes:
+      - ./tempo-distributed.yaml:/etc/tempo.yaml
+    environment:
+      - JAEGER_AGENT_HOST=distributor
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+
+  tempo-query:
+    image: grafana/tempo-query:latest
+    environment:
+    - BACKEND=query-frontend:3200
+    ports:
+    - "16686:16686"
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      - MINIO_ACCESS_KEY=tempo
+      - MINIO_SECRET_KEY=supersecret
+    ports:
+      - "9001:9001"
+    entrypoint:
+      - sh
+      - -euc
+      - mkdir -p /data/tempo && minio server /data --console-address ':9001'
+
+  k6-tracing:
+    image: ghcr.io/grafana/xk6-client-tracing:v0.0.5
+    environment:
+      - ENDPOINT=distributor:4317
+    restart: always
+    depends_on:
+      - distributor
+    logging:
+      driver: "none"
+
+  hotrod:
+    image: jaegertracing/example-hotrod:1.46
+    command: all --otel-exporter=otlp
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
+    ports:
+      - "8081:8080"
+
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - --config.file=/etc/prometheus.yaml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus.yaml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:11.0.0
+    volumes:
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    ports:
+      - "3001:3000"

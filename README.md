@@ -1,1 +1,1 @@
-# docker-compose-stacks
+# Example deployments
