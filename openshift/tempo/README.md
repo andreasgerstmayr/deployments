@@ -59,3 +59,16 @@ spec:
           https://tempo-platform-gateway.openshift-tempo-operator.svc.cluster.local:8080/api/traces/v1/platform/tempo/api/search | jq
   restartPolicy: Never
 ```
+
+## Tracing UI Plugin
+Install the **Cluster Observability Operator** and apply the following manifest:
+```
+apiVersion: observability.openshift.io/v1alpha1
+kind: UIPlugin
+metadata:
+  name: distributed-tracing
+spec:
+  type: DistributedTracing
+```
+
+Note: Tempo instances with multi-tenancy are not yet supported by the tracing UI plugin.
