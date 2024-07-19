@@ -4,8 +4,9 @@ metadata:
   labels:
     app.kubernetes.io/name: k6-tracing
   name: k6-tracing
-  namespace: tracing-apps
+  namespace: tracing-app-k6
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: k6-tracing

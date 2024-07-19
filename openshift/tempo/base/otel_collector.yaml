@@ -19,7 +19,9 @@ spec:
           http: {}
 
     connectors:
-      spanmetrics: {}
+      spanmetrics:
+        dimensions:
+        - name: k8s.namespace.name
 
     processors:
       k8sattributes: {}
