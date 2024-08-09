@@ -9,11 +9,6 @@ spec:
       name: minio
       type: s3
   storageSize: 1Gi
-  resources:
-    total:
-      limits:
-        memory: 4Gi
-        cpu: 4000m
   tenants:
     mode: openshift
     authentication:
