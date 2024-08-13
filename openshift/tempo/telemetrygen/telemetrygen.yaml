@@ -22,7 +22,7 @@ spec:
         image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
         args:
           - traces
-          - --otlp-endpoint=platform-collector.openshift-tempo-operator:4317
+          - --otlp-endpoint=platform-collector.openshift-tracing:4317
           - --otlp-insecure
           - --duration=1h
           - --service=faulty_service
@@ -33,7 +33,7 @@ spec:
         image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
         args:
           - traces
-          - --otlp-endpoint=platform-collector.openshift-tempo-operator:4317
+          - --otlp-endpoint=platform-collector.openshift-tracing:4317
           - --otlp-insecure
           - --duration=1h
           - --service=faulty_service

@@ -17,7 +17,7 @@ The k8-tracing load generator continuously create traces.
 HotROD creates traces if any button in the HotROD UI (see below) is clicked.
 
 ## Services
-* Jaeger UI: https://tempo-platform-gateway-openshift-tempo-operator.apps-crc.testing/platform
+* Jaeger UI: https://tempo-platform-gateway-openshift-tracing.apps-crc.testing/platform
 * HotROD:    http://hotrod-tracing-app-hotrod.apps-crc.testing/
 
 ## Ingest Traces using telemetrygen
@@ -32,7 +32,7 @@ spec:
     image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.92.0
     args:
     - traces
-    - --otlp-endpoint=platform-collector.openshift-tempo-operator:4317
+    - --otlp-endpoint=platform-collector.openshift-tracing:4317
     - --otlp-insecure
   restartPolicy: Never
 ```
@@ -57,7 +57,7 @@ spec:
           --header "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
           --cacert /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt \
           --data-urlencode 'q={ resource.service.name="article-service" }' \
-          https://tempo-platform-gateway.openshift-tempo-operator.svc.cluster.local:8080/api/traces/v1/platform/tempo/api/search | jq
+          https://tempo-platform-gateway.openshift-tracing.svc.cluster.local:8080/api/traces/v1/platform/tempo/api/search | jq
   restartPolicy: Never
 ```
 
@@ -84,7 +84,7 @@ mitmdump -p 9091 --mode "reverse:https://thanos-querier-openshift-monitoring.app
 
 Start a reverse proxy to access Tempo in CRC from a local Perses installation
 ```
-kubectl port-forward -n openshift-tempo-operator svc/tempo-platform-gateway 8081:8080
+kubectl port-forward -n openshift-tracing svc/tempo-platform-gateway 8081:8080
 mitmdump -p 3200 --mode "reverse:https://localhost:8081" --ssl-insecure \
   --modify-headers "/~q/Authorization/Bearer $(kubectl -n perses create token perses)" \
   --map-remote "|/api|/api/traces/v1/platform/tempo/api"
