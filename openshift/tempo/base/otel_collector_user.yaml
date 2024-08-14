@@ -1,7 +1,7 @@
 apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
-  name: platform
+  name: user
   namespace: openshift-tracing
 spec:
   observability:
@@ -34,7 +34,7 @@ spec:
         auth:
           authenticator: bearertokenauth
         headers:
-          X-Scope-OrgID: platform
+          X-Scope-OrgID: user
       prometheus:
         endpoint: 0.0.0.0:8889
 
@@ -53,31 +53,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: platform-traces-writer
-rules:
-- apiGroups: [tempo.grafana.com]
-  resources: [platform]
-  resourceNames: [traces]
-  verbs: [create]
----
-# allow platform-collector to write traces to Tempo
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: platform-traces-writer
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: platform-traces-writer
-subjects:
-- kind: ServiceAccount
-  name: platform-collector
-  namespace: openshift-tracing
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: platform-collector
+  name: openshift-tracing-user-collector
 rules:
 - apiGroups: [""]
   resources: ["namespaces", "pods"]
@@ -86,16 +62,42 @@ rules:
   resources: ["replicasets"]
   verbs: ["get", "list", "watch"]
 ---
-# allow platform-collector to read namespaces, pods and replicasets (required for k8sattributes processor)
+# allow user-collector to read namespaces, pods and replicasets (required for k8sattributes processor)
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: platform-collector
+  name: openshift-tracing-user-collector
 roleRef:
   kind: ClusterRole
-  name: platform-collector
+  name: openshift-tracing-user-collector
   apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: ServiceAccount
-  name: platform-collector
+  name: user-collector
+  namespace: openshift-tracing
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: traces-writer-user
+rules:
+- apiGroups: [tempo.grafana.com]
+  resources: [user]
+  resourceNames: [traces]
+  verbs: [create]
+---
+# allow user-collector to write traces to the 'user' tenant in Tempo
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: traces-writer-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traces-writer-user
+subjects:
+- kind: ServiceAccount
+  name: user-collector
   namespace: openshift-tracing

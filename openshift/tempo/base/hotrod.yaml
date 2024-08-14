@@ -22,7 +22,7 @@ spec:
         - --otel-exporter=otlp
         env:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
-          value: http://platform-collector.openshift-tracing:4318
+          value: http://user-collector.openshift-tracing:4318
         ports:
         - containerPort: 8080
           name: frontend

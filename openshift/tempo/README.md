@@ -1,11 +1,7 @@
 # Tempo
-Tempo Microservices multi-tenant deployment with OpenTelemetry collector (k8sattributes and spanmetrics) and HotROD, k6-tracing and MinIO.
+Tempo Microservices multi-tenant (`platform` and `user` tenants) deployment with OpenTelemetry collector (k8sattributes and spanmetrics) and HotROD, k6-tracing and MinIO.
 
 ## Setup
-The following operators must be installed prior to applying the manifests:
-* **Tempo Operator**
-* **Red Hat build of OpenTelemetry**
-
 To store spanmetrics, cluster monitoring must be enabled when using OpenShift Local (`crc config set enable-cluster-monitoring true`).
 
 ```
@@ -17,7 +13,7 @@ The k8-tracing load generator continuously create traces.
 HotROD creates traces if any button in the HotROD UI (see below) is clicked.
 
 ## Services
-* Jaeger UI: https://tempo-platform-gateway-openshift-tracing.apps-crc.testing/platform
+* Jaeger UI: https://tempo-platform-gateway-openshift-tracing.apps-crc.testing/platform and https://tempo-platform-gateway-openshift-tracing.apps-crc.testing/user
 * HotROD:    http://hotrod-tracing-app-hotrod.apps-crc.testing/
 
 ## Ingest Traces using telemetrygen
