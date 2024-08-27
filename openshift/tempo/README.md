@@ -5,7 +5,6 @@ Tempo Microservices multi-tenant (`platform` and `user` tenants) deployment with
 To store spanmetrics, cluster monitoring must be enabled when using OpenShift Local (`crc config set enable-cluster-monitoring true`).
 
 ```
-kubectl apply -f base/namespaces.yaml
 kubectl apply -f base
 ```
 
