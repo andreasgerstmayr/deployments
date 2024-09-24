@@ -45,6 +45,8 @@ metrics_generator:
     remote_write:
       - url: http://prometheus:9090/api/v1/write
         send_exemplars: true
+  traces_storage:
+    path: /var/tempo/generator/traces
 
 storage:
   trace:
@@ -59,10 +61,9 @@ storage:
       path: /var/tempo/wal             # where to store the wal locally
     local:
       path: /var/tempo/blocks
-    block:
-      version: vParquet4
 
 overrides:
   defaults:
     metrics_generator:
-      processors: ['service-graphs', 'span-metrics']
+      processors: ['service-graphs', 'span-metrics', 'local-blocks']
+      generate_native_histograms: both

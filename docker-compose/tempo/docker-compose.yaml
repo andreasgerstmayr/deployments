@@ -8,9 +8,7 @@ services:
     ports:
       - "4318:4318"   # otlp-http
     environment:
-      - JAEGER_AGENT_HOST=distributor
-      - JAEGER_SAMPLER_TYPE=const
-      - JAEGER_SAMPLER_PARAM=1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
 
   ingester-0:
     image: *tempoImage
@@ -19,9 +17,7 @@ services:
     volumes:
       - ./tempo-distributed.yaml:/etc/tempo.yaml
     environment:
-      - JAEGER_AGENT_HOST=distributor
-      - JAEGER_SAMPLER_TYPE=const
-      - JAEGER_SAMPLER_PARAM=1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
 
   ingester-1:
     image: *tempoImage
@@ -30,9 +26,7 @@ services:
     volumes:
       - ./tempo-distributed.yaml:/etc/tempo.yaml
     environment:
-      - JAEGER_AGENT_HOST=distributor
-      - JAEGER_SAMPLER_TYPE=const
-      - JAEGER_SAMPLER_PARAM=1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
 
   ingester-2:
     image: *tempoImage
@@ -41,9 +35,7 @@ services:
     volumes:
       - ./tempo-distributed.yaml:/etc/tempo.yaml
     environment:
-      - JAEGER_AGENT_HOST=distributor
-      - JAEGER_SAMPLER_TYPE=const
-      - JAEGER_SAMPLER_PARAM=1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
 
   query-frontend:
     image: *tempoImage
@@ -54,9 +46,7 @@ services:
     ports:
       - "3200:3200"
     environment:
-      - JAEGER_AGENT_HOST=distributor
-      - JAEGER_SAMPLER_TYPE=const
-      - JAEGER_SAMPLER_PARAM=1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
 
   querier:
     image: *tempoImage
@@ -65,9 +55,7 @@ services:
     volumes:
       - ./tempo-distributed.yaml:/etc/tempo.yaml
     environment:
-      - JAEGER_AGENT_HOST=distributor
-      - JAEGER_SAMPLER_TYPE=const
-      - JAEGER_SAMPLER_PARAM=1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
 
   compactor:
     image: *tempoImage
@@ -76,9 +64,7 @@ services:
     volumes:
       - ./tempo-distributed.yaml:/etc/tempo.yaml
     environment:
-      - JAEGER_AGENT_HOST=distributor
-      - JAEGER_SAMPLER_TYPE=const
-      - JAEGER_SAMPLER_PARAM=1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
 
   metrics-generator:
     image: *tempoImage
@@ -87,9 +73,7 @@ services:
     volumes:
       - ./tempo-distributed.yaml:/etc/tempo.yaml
     environment:
-      - JAEGER_AGENT_HOST=distributor
-      - JAEGER_SAMPLER_TYPE=const
-      - JAEGER_SAMPLER_PARAM=1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
 
   tempo-query:
     image: grafana/tempo-query:latest
@@ -148,5 +132,6 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
       - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+      - GF_INSTALL_PLUGINS=https://storage.googleapis.com/integration-artifacts/grafana-exploretraces-app/grafana-exploretraces-app-latest.zip;grafana-traces-app
     ports:
       - "3001:3000"
