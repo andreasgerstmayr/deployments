@@ -1,5 +1,5 @@
 # Tempo
-Tempo Microservices deployment with metrics-generator and Prometheus, Grafana, HotROD, k6-tracing and MinIO.
+Tempo Microservices deployment with metrics-generator and OpenTelemetry collector, Prometheus, Grafana, HotROD, k6-tracing and MinIO.
 
 ## Setup
 ```

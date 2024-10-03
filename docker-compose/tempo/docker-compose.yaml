@@ -4,76 +4,76 @@ services:
     command: "-target=distributor -config.file=/etc/tempo.yaml"
     restart: always
     volumes:
-      - ./tempo-distributed.yaml:/etc/tempo.yaml
+      - ./tempo.yaml:/etc/tempo.yaml
     ports:
       - "4318:4318"   # otlp-http
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
 
   ingester-0:
     image: *tempoImage
     command: "-target=ingester -config.file=/etc/tempo.yaml"
     restart: always
     volumes:
-      - ./tempo-distributed.yaml:/etc/tempo.yaml
+      - ./tempo.yaml:/etc/tempo.yaml
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
 
   ingester-1:
     image: *tempoImage
     command: "-target=ingester -config.file=/etc/tempo.yaml"
     restart: always
     volumes:
-      - ./tempo-distributed.yaml:/etc/tempo.yaml
+      - ./tempo.yaml:/etc/tempo.yaml
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
 
   ingester-2:
     image: *tempoImage
     command: "-target=ingester -config.file=/etc/tempo.yaml"
     restart: always
     volumes:
-      - ./tempo-distributed.yaml:/etc/tempo.yaml
+      - ./tempo.yaml:/etc/tempo.yaml
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
 
   query-frontend:
     image: *tempoImage
     command: "-target=query-frontend -config.file=/etc/tempo.yaml -log.level=debug"
     restart: always
     volumes:
-      - ./tempo-distributed.yaml:/etc/tempo.yaml
+      - ./tempo.yaml:/etc/tempo.yaml
     ports:
       - "3200:3200"
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
 
   querier:
     image: *tempoImage
     command: "-target=querier -config.file=/etc/tempo.yaml -log.level=debug"
     restart: always
     volumes:
-      - ./tempo-distributed.yaml:/etc/tempo.yaml
+      - ./tempo.yaml:/etc/tempo.yaml
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
 
   compactor:
     image: *tempoImage
     command: "-target=compactor -config.file=/etc/tempo.yaml"
     restart: always
     volumes:
-      - ./tempo-distributed.yaml:/etc/tempo.yaml
+      - ./tempo.yaml:/etc/tempo.yaml
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
 
   metrics-generator:
     image: *tempoImage
     command: "-target=metrics-generator -config.file=/etc/tempo.yaml"
     restart: always
     volumes:
-      - ./tempo-distributed.yaml:/etc/tempo.yaml
+      - ./tempo.yaml:/etc/tempo.yaml
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
 
   tempo-query:
     image: grafana/tempo-query:latest
@@ -97,18 +97,14 @@ services:
   k6-tracing:
     image: ghcr.io/grafana/xk6-client-tracing:v0.0.5
     environment:
-      - ENDPOINT=distributor:4317
+      - ENDPOINT=otel:4317
     restart: always
-    depends_on:
-      - distributor
-    logging:
-      driver: "none"
 
   hotrod:
     image: jaegertracing/example-hotrod:1.46
     command: all --otel-exporter=otlp
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://distributor:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
     ports:
       - "8081:8080"
 
@@ -118,20 +114,25 @@ services:
       - --config.file=/etc/prometheus.yaml
       - --web.enable-remote-write-receiver
       - --enable-feature=exemplar-storage
+      - --enable-feature=native-histograms
     volumes:
       - ./prometheus.yaml:/etc/prometheus.yaml
     ports:
       - "9090:9090"
 
   grafana:
-    image: grafana/grafana:11.0.0
+    image: grafana/grafana:11.2.1
     volumes:
       - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
-      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
       - GF_INSTALL_PLUGINS=https://storage.googleapis.com/integration-artifacts/grafana-exploretraces-app/grafana-exploretraces-app-latest.zip;grafana-traces-app
     ports:
       - "3001:3000"
+
+  otel:
+    image: ghcr.io/os-observability/redhat-opentelemetry-collector/redhat-opentelemetry-collector:latest
+    volumes:
+      - ./otel.yaml:/etc/otelcol/config.yaml
