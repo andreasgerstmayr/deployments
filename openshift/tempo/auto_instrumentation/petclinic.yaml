@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic
+  namespace: tracing-app-petclinic
+spec:
+  selector:
+    matchLabels:
+      app: petclinic
+  template:
+    metadata:
+      labels:
+        app: petclinic
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: user-workload-instrumentation
+    spec:
+      containers:
+      - image: springcommunity/spring-framework-petclinic:6.0.3
+        name: petclinic
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic
+  namespace: tracing-app-petclinic
+spec:
+  selector:
+    app: petclinic
+  ports:
+  - protocol: TCP
+    port: 8080
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: petclinic
+  namespace: tracing-app-petclinic
+spec:
+  to:
+    kind: Service
+    name: petclinic
+  port:
+    targetPort: 8080

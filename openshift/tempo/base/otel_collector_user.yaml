@@ -15,11 +15,18 @@ spec:
     receivers:
       otlp:
         protocols:
-          grpc: {}
-          http: {}
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+      jaeger:
+        protocols:
+          thrift_compact:
+            endpoint: 0.0.0.0:6831
 
     connectors:
       spanmetrics:
+        metrics_flush_interval: 5s # default: 1 min
         dimensions:
         - name: k8s.namespace.name
 
@@ -37,12 +44,15 @@ spec:
           X-Scope-OrgID: user
       prometheus:
         endpoint: 0.0.0.0:8889
+        add_metric_suffixes: false
+        resource_to_telemetry_conversion:
+          enabled: true # by default resource attributes are dropped
 
     service:
       extensions: [bearertokenauth]
       pipelines:
         traces:
-          receivers: [otlp]
+          receivers: [otlp, jaeger]
           processors: [k8sattributes]
           exporters: [otlp, spanmetrics]
         metrics:

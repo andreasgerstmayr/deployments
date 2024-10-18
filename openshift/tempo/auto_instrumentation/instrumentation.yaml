@@ -1,0 +1,8 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: user-workload-instrumentation
+  namespace: tracing-app-petclinic
+spec:
+  exporter:
+    endpoint: http://user-collector.openshift-tracing:4317

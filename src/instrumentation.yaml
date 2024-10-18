@@ -1,0 +1,14 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: user-workload-instrumentation
+  namespace: tracing-app-photo
+spec:
+  exporter:
+    endpoint: http://user-collector.openshift-tracing:4317
+  python:
+    env:
+    # Python autoinstrumentation uses http/proto by default
+    # so data must be sent to 4318 instead of 4317.
+    - name: OTEL_EXPORTER_OTLP_ENDPOINT
+      value: http://user-collector.openshift-tracing:4318

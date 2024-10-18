@@ -4,7 +4,7 @@ metadata:
   labels:
     app.kubernetes.io/name: telemetrygen
   name: telemetrygen
-  namespace: tracing-app-k6
+  namespace: tracing-app-telemetrygen
 spec:
   replicas: 1
   selector:
@@ -22,10 +22,10 @@ spec:
         image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
         args:
           - traces
-          - --otlp-endpoint=platform-collector.openshift-tracing:4317
+          - --otlp-endpoint=user-collector.openshift-tracing:4317
           - --otlp-insecure
           - --duration=1h
-          - --service=faulty_service
+          - --service=good_service
           - --rate=3 # spans per second
           - --child-spans=2
       # this generates 2 spans per second with an error status
@@ -33,7 +33,7 @@ spec:
         image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
         args:
           - traces
-          - --otlp-endpoint=platform-collector.openshift-tracing:4317
+          - --otlp-endpoint=user-collector.openshift-tracing:4317
           - --otlp-insecure
           - --duration=1h
           - --service=faulty_service

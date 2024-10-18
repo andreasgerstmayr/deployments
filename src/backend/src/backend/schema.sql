@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS ratings (
+  id INTEGER PRIMARY KEY,
+  rating INTEGER
+);

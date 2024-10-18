@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: tracing-app-photo
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: backend
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: user-workload-instrumentation
+    spec:
+      containers:
+      - name: backend
+        image: quay.io/agerstmayr/tracing-demo-backend:0.9.0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: tracing-app-photo
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: backend
+  ports:
+  - port: 5000
+    targetPort: 5000
