@@ -1,4 +1,4 @@
-{{- if .Values.traces.enabled }}
+{{- if and .Values.storage.traces.enabled .Values.storage.traces.installOperator }}
 apiVersion: v1
 kind: Namespace
 metadata:

@@ -1,26 +1,26 @@
-{{- if .Values.logs.enabled }}
+{{- if and .Values.collection.installOperator (eq .Values.collection.clusterLogs.collector "vector") }}
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: openshift-operators-redhat
+  name: openshift-logging
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: openshift-operators-redhat
-  namespace: openshift-operators-redhat
+  name: openshift-logging
+  namespace: openshift-logging
 spec:
   upgradeStrategy: Default
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: loki-operator
-  namespace: openshift-operators-redhat
+  name: cluster-logging
+  namespace: openshift-logging
 spec:
   channel: stable-6.0
   installPlanApproval: Automatic
-  name: loki-operator
+  name: cluster-logging
   source: redhat-operators
   sourceNamespace: openshift-marketplace
 {{- end }}

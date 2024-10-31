@@ -1,4 +1,4 @@
-{{- if .Values.otel_collector.enabled }}
+{{- if .Values.collection.enabled }}
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
@@ -6,5 +6,7 @@ metadata:
   namespace: openshift-observability
 spec:
   exporter:
-    endpoint: http://otel-collector.openshift-observability:4317
+    endpoint: http://telemetry-collector.openshift-observability:4317
+  sampler:
+    type: parentbased_always_on
 {{- end }}

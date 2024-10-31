@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: tracing-app-k6
+  name: demo-app-k6
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -10,7 +10,7 @@ metadata:
   labels:
     app.kubernetes.io/name: k6-tracing
   name: k6-tracing
-  namespace: tracing-app-k6
+  namespace: demo-app-k6
 spec:
   replicas: 1
   selector:
@@ -26,5 +26,5 @@ spec:
         image: ghcr.io/grafana/xk6-client-tracing:v0.0.5
         env:
         - name: ENDPOINT
-          value: otel-collector.openshift-observability:4317
+          value: telemetry-collector.openshift-observability:4317
 {{- end }}

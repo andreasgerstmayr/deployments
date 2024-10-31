@@ -1,4 +1,4 @@
-{{- if .Values.logs.enabled }}
+{{- if and .Values.collection.enabled .Values.collection.clusterLogs.enabled (eq .Values.collection.clusterLogs.collector "vector") }}
 apiVersion: observability.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:

@@ -1,0 +1,13 @@
+{{- if and .Values.storage.metrics.enabled .Values.storage.metrics.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: prometheus
+  namespace: openshift-observability
+spec:
+  to:
+    kind: Service
+    name: openshift-monitoring-prometheus
+  port:
+    targetPort: web
+{{- end }}

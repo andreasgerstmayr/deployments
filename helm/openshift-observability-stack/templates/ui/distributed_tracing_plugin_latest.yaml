@@ -1,14 +1,14 @@
-{{- if and .Values.traces.enabled .Values.traces.ui.enabled (eq .Values.traces.ui.version "development") }}
+{{- if and .Values.ui.traces.enabled (eq .Values.ui.traces.version "development") }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: distributed-tracing-console-plugin
-  namespace: openshift-operators
+  namespace: openshift-observability
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: list-tempo-resources
+  name: distributed-tracing-console-plugin
 rules:
 - apiGroups: ["tempo.grafana.com"]
   resources: ["tempostacks", "tempomonolithics"]
@@ -17,14 +17,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: list-tempo-resources
+  name: distributed-tracing-console-plugin
 subjects:
 - kind: ServiceAccount
   name: distributed-tracing-console-plugin
-  namespace: openshift-operators
+  namespace: openshift-observability
 roleRef:
   kind: ClusterRole
-  name: list-tempo-resources
+  name: distributed-tracing-console-plugin
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: v1
@@ -33,7 +33,7 @@ metadata:
   annotations:
     service.alpha.openshift.io/serving-cert-secret-name: plugin-serving-cert
   name: distributed-tracing-console-plugin
-  namespace: openshift-operators
+  namespace: openshift-observability
   labels:
     app: distributed-tracing-console-plugin
     app.kubernetes.io/component: distributed-tracing-console-plugin
@@ -54,13 +54,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: distributed-tracing-console-plugin
-  namespace: openshift-operators
+  namespace: openshift-observability
   labels:
     app: distributed-tracing-console-plugin
     app.kubernetes.io/component: distributed-tracing-console-plugin
     app.kubernetes.io/instance: distributed-tracing-console-plugin
     app.kubernetes.io/part-of: distributed-tracing-console-plugin
-    app.openshift.io/runtime-namespace: openshift-operators
+    app.openshift.io/runtime-namespace: openshift-observability
 spec:
   replicas: 1
   selector:
@@ -129,14 +129,14 @@ apiVersion: console.openshift.io/v1
 kind: ConsolePlugin
 metadata:
   name: distributed-tracing-console-plugin
-  namespace: openshift-operators
+  namespace: openshift-observability
 spec:
   displayName: "Distributed Tracing Console Plugin"
   backend:
     type: Service
     service:
       name: distributed-tracing-console-plugin
-      namespace: openshift-operators
+      namespace: openshift-observability
       basePath: "/"
       port: 9443
   proxy:
@@ -145,7 +145,7 @@ spec:
     endpoint:
       service:
         name: distributed-tracing-console-plugin
-        namespace: openshift-operators
+        namespace: openshift-observability
         port: 9443
       type: Service
 ---
@@ -153,7 +153,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: distributed-tracing-console-plugin-config
-  namespace: openshift-operators
+  namespace: openshift-observability
   labels:
     app: distributed-tracing-console-plugin
     app.kubernetes.io/part-of: distributed-tracing-console-plugin

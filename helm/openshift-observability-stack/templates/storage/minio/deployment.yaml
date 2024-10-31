@@ -1,9 +1,9 @@
-{{- if .Values.minio.enabled }}
+{{- if .Values.storage.minio.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: minio
-  namespace: minio
+  namespace: openshift-observability
 spec:
   selector:
     matchLabels:
@@ -20,8 +20,8 @@ spec:
             - /bin/sh
             - -c
             - |
-              mkdir -p /storage/{{ .Values.logs.storage.s3.bucket }} && \
-              mkdir -p /storage/{{ .Values.traces.storage.s3.bucket }} && \
+              mkdir -p /storage/{{ .Values.storage.logs.storage.s3.bucket }} && \
+              mkdir -p /storage/{{ .Values.storage.traces.storage.s3.bucket }} && \
               minio server /storage
           env:
             - name: MINIO_ACCESS_KEY

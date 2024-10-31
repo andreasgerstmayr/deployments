@@ -1,0 +1,6 @@
+{{- if .Values.storage.logs.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-logging
+{{- end }}

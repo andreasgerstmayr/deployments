@@ -1,0 +1,33 @@
+{{- if .Values.storage.traces.enabled }}
+apiVersion: tempo.grafana.com/v1alpha1
+kind:  TempoStack
+metadata:
+  name: openshift-tracing
+  namespace: openshift-observability
+spec:
+  storage:
+    secret:
+      name: openshift-tracing-s3
+      type: s3
+  storageSize: 1Gi
+  tenants:
+    mode: openshift
+    authentication:
+    - tenantName: application
+      tenantId: application
+  #observability:
+  #  tracing:
+  #    jaeger_agent_endpoint: platform-collector.openshift-tracing:6831
+  #    sampling_fraction: "1"
+  template:
+    gateway:
+      enabled: true
+    queryFrontend:
+      jaegerQuery:
+        enabled: true
+        {{- if .Values.storage.metrics.enabled }}
+        monitorTab:
+          enabled: true
+          prometheusEndpoint: http://openshift-monitoring-prometheus.openshift-observability.svc:9090
+        {{- end }}
+{{- end }}

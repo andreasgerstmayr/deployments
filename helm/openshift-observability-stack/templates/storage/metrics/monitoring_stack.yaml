@@ -1,0 +1,17 @@
+{{- if .Values.storage.metrics.enabled }}
+apiVersion: monitoring.rhobs/v1alpha1
+kind: MonitoringStack
+metadata:
+  name: openshift-monitoring
+  namespace: openshift-observability
+spec:
+  prometheusConfig:
+    replicas: 1
+    enableOtlpHttpReceiver: true
+  alertmanagerConfig:
+    disabled: true
+  resourceSelector:
+    matchLabels:
+      app: demo
+  retention: 1d
+{{- end }}

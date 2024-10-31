@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: tracing-app-hotrod
+  name: demo-app-hotrod
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -10,7 +10,7 @@ metadata:
   labels:
     app.kubernetes.io/name: hotrod
   name: hotrod
-  namespace: tracing-app-hotrod
+  namespace: demo-app-hotrod
 spec:
   selector:
     matchLabels:
@@ -28,7 +28,7 @@ spec:
         - --otel-exporter=otlp
         env:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
-          value: http://otel-collector.openshift-observability:4318
+          value: http://telemetry-collector.openshift-observability:4318
         ports:
         - containerPort: 8080
           name: frontend
@@ -48,7 +48,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hotrod
-  namespace: tracing-app-hotrod
+  namespace: demo-app-hotrod
 spec:
   selector:
     app.kubernetes.io/name: hotrod
@@ -61,7 +61,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: hotrod
-  namespace: tracing-app-hotrod
+  namespace: demo-app-hotrod
 spec:
   to:
     kind: Service

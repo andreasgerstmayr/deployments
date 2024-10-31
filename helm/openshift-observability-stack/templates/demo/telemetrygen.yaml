@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: tracing-app-telemetrygen
+  name: demo-app-telemetrygen
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -10,7 +10,7 @@ metadata:
   labels:
     app.kubernetes.io/name: telemetrygen
   name: telemetrygen
-  namespace: tracing-app-telemetrygen
+  namespace: demo-app-telemetrygen
 spec:
   replicas: 1
   selector:
@@ -21,28 +21,51 @@ spec:
       labels:
         app.kubernetes.io/name: telemetrygen
     spec:
-      # in total 5 spans per second are generated, with 2/5 (40%) containing an error
       containers:
+      # Metrics
+      # this generates 1 metric value for the 'gen' metric every 10 seconds
+      - name: metricsgen1
+        image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
+        args:
+          - metrics
+          - --otlp-endpoint=telemetry-collector.openshift-observability:4317
+          - --otlp-insecure
+          - --duration=1h
+          - --rate=0.1 # metrics per second
+
+      # Logs
+      # this generates 1 log message ("body":"the message") every 10 seconds
+      - name: logsgen1
+        image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
+        args:
+          - logs
+          - --otlp-endpoint=telemetry-collector.openshift-observability:4317
+          - --otlp-insecure
+          - --duration=1h
+          - --rate=0.1 # logs per second
+
+      # Traces
+      # in total 5 spans per second are generated, with 2/5 (40%) containing an error
       # this generates 3 spans per second
-      - name: telemetrygen1
+      - name: tracegen1
         image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
         args:
           - traces
-          - --otlp-endpoint=user-collector.openshift-tracing:4317
+          - --otlp-endpoint=telemetry-collector.openshift-observability:4317
           - --otlp-insecure
           - --duration=1h
-          - --service=good_service
+          - --service=telemetrygen-good
           - --rate=3 # spans per second
           - --child-spans=2
       # this generates 2 spans per second with an error status
-      - name: telemetrygen2
+      - name: tracegen2
         image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
         args:
           - traces
-          - --otlp-endpoint=user-collector.openshift-tracing:4317
+          - --otlp-endpoint=telemetry-collector.openshift-observability:4317
           - --otlp-insecure
           - --duration=1h
-          - --service=faulty_service
+          - --service=telemetrygen-faulty
           - --rate=2 # spans per second
           - --child-spans=1
           - --status-code=Error

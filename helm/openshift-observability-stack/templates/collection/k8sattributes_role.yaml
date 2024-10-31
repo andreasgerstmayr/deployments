@@ -1,0 +1,14 @@
+{{- if .Values.collection.enabled }}
+# required permissions for k8sattributes processor: read namespaces, pods and replicasets
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: openshift-observability-k8sattributes-processor
+rules:
+- apiGroups: [""]
+  resources: ["namespaces", "pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["replicasets"]
+  verbs: ["get", "list", "watch"]
+{{- end }}

@@ -1,48 +1,72 @@
+clusterObservabilityOperator:
+  installOperator: true
+
+
+# Define telemetry storage
 storage:
+  # MinIO provides object storage
+  minio:
+    enabled: true
+
+  # Object storage credentials required for Loki and Tempo
   s3:
-    endpoint: http://minio.minio:9000
+    endpoint: http://minio.openshift-observability:9000
     access_key_id: sample-key-id
     access_key_secret: sample-key-secret
 
-minio:
-  enabled: true
+  metrics:
+    enabled: true
 
-cluster_observability_operator:
-  enabled: true
+    # Expose Route to Prometheus
+    route:
+      enabled: true
 
-otel_collector:
+  logs:
+    enabled: true
+    installOperator: true
+    size: 1x.demo
+    storage:
+      s3:
+        bucket: tempo
+      #storageClassName: crc-csi-hostpath-provisioner # use this for CRC
+      storageClassName: gp3-csi # use this for AWS
+
+  traces:
+    enabled: true
+    installOperator: true
+    storage:
+      s3:
+        bucket: tempo
+
+
+# Define telemetry collection
+collection:
+  installOperator: true
   enabled: true
   replicas: 1
 
-metrics:
-  enabled: true
-
-logs:
-  enabled: true
-  size: 1x.demo
-  storage:
-    s3:
-      bucket: loki
-  ui:
+  # Define the cluster log forwarding
+  clusterLogs:
     enabled: true
+    # Available options: otel, vector
+    collector: otel
 
-traces:
-  enabled: true
-  storage:
-    s3:
-      bucket: tempo
-  ui:
+
+# Enable OpenShift Console UI Plugins
+ui:
+  logs:
+    enabled: true
+  traces:
     enabled: true
     # if set to development, the plugin must be enabled manually in the Admin Console under Home > Overview > Status > Dynamic Plugins
     version: development
+  troubleshootingPanel:
+    enabled: true
 
-korrel8r:
-  enabled: true
 
+# Enable various demo applications
 demo:
   hotrod: true
   k6_tracing: true
   telemetrygen: true
-
-  # demo for Java auto-instrumentation
-  petclinic: true
+  petclinic: true # demo for Java auto-instrumentation

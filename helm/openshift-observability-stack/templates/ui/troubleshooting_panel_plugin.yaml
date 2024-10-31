@@ -1,4 +1,4 @@
-{{- if and .Values.korrel8r.enabled .Values.cluster_observability_operator.enabled }}
+{{- if .Values.ui.troubleshootingPanel.enabled }}
 apiVersion: observability.openshift.io/v1alpha1
 kind: UIPlugin
 metadata:
