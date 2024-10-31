@@ -1,0 +1,69 @@
+{{- if .Values.demo.hotrod }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tracing-app-hotrod
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: hotrod
+  name: hotrod
+  namespace: tracing-app-hotrod
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hotrod
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: hotrod
+    spec:
+      containers:
+      - image: jaegertracing/example-hotrod:1.46
+        name: hotrod
+        args:
+        - all
+        - --otel-exporter=otlp
+        env:
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://otel-collector.openshift-observability:4318
+        ports:
+        - containerPort: 8080
+          name: frontend
+        - containerPort: 8081
+          name: customer
+        - containerPort: 8083
+          name: route
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100M
+          requests:
+            cpu: 100m
+            memory: 100M
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hotrod
+  namespace: tracing-app-hotrod
+spec:
+  selector:
+    app.kubernetes.io/name: hotrod
+  ports:
+  - name: frontend
+    port: 8080
+    targetPort: frontend
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: hotrod
+  namespace: tracing-app-hotrod
+spec:
+  to:
+    kind: Service
+    name: hotrod
+{{- end }}

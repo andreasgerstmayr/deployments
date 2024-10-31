@@ -1,0 +1,42 @@
+{{- if .Values.minio.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: minio
+    spec:
+      containers:
+        - command:
+            - /bin/sh
+            - -c
+            - |
+              mkdir -p /storage/{{ .Values.logs.storage.s3.bucket }} && \
+              mkdir -p /storage/{{ .Values.traces.storage.s3.bucket }} && \
+              minio server /storage
+          env:
+            - name: MINIO_ACCESS_KEY
+              value: {{ .Values.storage.s3.access_key_id }}
+            - name: MINIO_SECRET_KEY
+              value: {{ .Values.storage.s3.access_key_secret }}
+          image: minio/minio
+          name: minio
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - mountPath: /storage
+              name: storage
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: minio
+{{- end }}

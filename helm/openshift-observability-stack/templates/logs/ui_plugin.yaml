@@ -1,0 +1,11 @@
+{{- if and .Values.logs.enabled .Values.logs.ui.enabled .Values.cluster_observability_operator.enabled }}
+apiVersion: observability.openshift.io/v1alpha1
+kind: UIPlugin
+metadata:
+  name: logging
+spec:
+  type: Logging
+  logging:
+    lokiStack:
+      name: logging-loki
+{{- end }}

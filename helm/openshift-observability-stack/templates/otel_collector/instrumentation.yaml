@@ -1,0 +1,10 @@
+{{- if .Values.otel_collector.enabled }}
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: instrumentation
+  namespace: openshift-observability
+spec:
+  exporter:
+    endpoint: http://otel-collector.openshift-observability:4317
+{{- end }}

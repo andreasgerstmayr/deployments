@@ -1,0 +1,48 @@
+storage:
+  s3:
+    endpoint: http://minio.minio:9000
+    access_key_id: sample-key-id
+    access_key_secret: sample-key-secret
+
+minio:
+  enabled: true
+
+cluster_observability_operator:
+  enabled: true
+
+otel_collector:
+  enabled: true
+  replicas: 1
+
+metrics:
+  enabled: true
+
+logs:
+  enabled: true
+  size: 1x.demo
+  storage:
+    s3:
+      bucket: loki
+  ui:
+    enabled: true
+
+traces:
+  enabled: true
+  storage:
+    s3:
+      bucket: tempo
+  ui:
+    enabled: true
+    # if set to development, the plugin must be enabled manually in the Admin Console under Home > Overview > Status > Dynamic Plugins
+    version: development
+
+korrel8r:
+  enabled: true
+
+demo:
+  hotrod: true
+  k6_tracing: true
+  telemetrygen: true
+
+  # demo for Java auto-instrumentation
+  petclinic: true
