@@ -8,61 +8,94 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/name: telemetrygen
-  name: telemetrygen
+    app.kubernetes.io/name: telemetrygen-metrics
+  name: telemetrygen-metrics
   namespace: demo-app-telemetrygen
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: telemetrygen
+      app.kubernetes.io/name: telemetrygen-metrics
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: telemetrygen
+        app.kubernetes.io/name: telemetrygen-metrics
     spec:
       containers:
-      # Metrics
       # this generates 1 metric value for the 'gen' metric every 10 seconds
-      - name: metricsgen1
+      - name: telemetrygen1
         image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
         args:
           - metrics
-          - --otlp-endpoint=telemetry-collector.openshift-observability:4317
+          - --otlp-endpoint=otlp-collector.openshift-observability:4317
           - --otlp-insecure
           - --duration=1h
           - --rate=0.1 # metrics per second
-
-      # Logs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: telemetrygen-logs
+  name: telemetrygen-logs
+  namespace: demo-app-telemetrygen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: telemetrygen-logs
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: telemetrygen-logs
+    spec:
+      containers:
       # this generates 1 log message ("body":"the message") every 10 seconds
-      - name: logsgen1
+      - name: telemetrygen1
         image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
         args:
           - logs
-          - --otlp-endpoint=telemetry-collector.openshift-observability:4317
+          - --otlp-endpoint=otlp-collector.openshift-observability:4317
           - --otlp-insecure
           - --duration=1h
           - --rate=0.1 # logs per second
-
-      # Traces
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: telemetrygen-traces
+  name: telemetrygen-traces
+  namespace: demo-app-telemetrygen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: telemetrygen-traces
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: telemetrygen-traces
+    spec:
+      containers:
       # in total 5 spans per second are generated, with 2/5 (40%) containing an error
       # this generates 3 spans per second
-      - name: tracegen1
+      - name: telemetrygen1
         image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
         args:
           - traces
-          - --otlp-endpoint=telemetry-collector.openshift-observability:4317
+          - --otlp-endpoint=otlp-collector.openshift-observability:4317
           - --otlp-insecure
           - --duration=1h
           - --service=telemetrygen-good
           - --rate=3 # spans per second
           - --child-spans=2
       # this generates 2 spans per second with an error status
-      - name: tracegen2
+      - name: telemetrygen2
         image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.105.0
         args:
           - traces
-          - --otlp-endpoint=telemetry-collector.openshift-observability:4317
+          - --otlp-endpoint=otlp-collector.openshift-observability:4317
           - --otlp-insecure
           - --duration=1h
           - --service=telemetrygen-faulty

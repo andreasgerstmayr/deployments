@@ -1,22 +1,19 @@
-{{- if and .Values.collection.enabled .Values.collection.clusterLogs.enabled (eq .Values.collection.clusterLogs.collector "vector") }}
+{{- if .Values.collection.clusterLogs.enabled }}
 apiVersion: observability.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
   name: collector
   namespace: openshift-logging
+  annotations:
+    observability.openshift.io/tech-preview-otlp-output: "enabled"
 spec:
   serviceAccount:
     name: collector
   outputs:
-  - name: default-lokistack
-    type: lokiStack
-    lokiStack:
-      target:
-        name: logging-loki
-        namespace: openshift-logging
-      authentication:
-        token:
-          from: serviceAccount
+  - name: default-otlp
+    type: otlp
+    otlp:
+      url: http://otlp-collector.openshift-observability:4318/v1/logs
     tls:
       ca:
         key: service-ca.crt
@@ -27,5 +24,5 @@ spec:
     - application
     - infrastructure
     outputRefs:
-    - default-lokistack
+    - default-otlp
 {{- end }}

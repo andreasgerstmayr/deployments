@@ -1,0 +1,27 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: loki-application
+  namespace: openshift-observability
+spec:
+  valuesFrom:
+  - targetPath: "secureJsonData.httpHeaderValue1"
+    valueFrom:
+      secretKeyRef:
+        name: grafana-sa
+        key: token
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  datasource:
+    type: loki
+    name: Loki (application tenant)
+    access: proxy
+    url: https://logging-loki-gateway-http.openshift-logging.svc.cluster.local:8080/api/logs/v1/application
+    jsonData:
+      tlsSkipVerify: true # TODO
+      httpHeaderName1: "Authorization"
+    secureJsonData:
+      httpHeaderValue1: "Bearer ${token}"
+{{- end }}

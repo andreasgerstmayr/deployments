@@ -1,36 +1,7 @@
-{{- if and .Values.collection.enabled .Values.collection.clusterLogs.enabled (eq .Values.collection.clusterLogs.collector "vector") }}
+{{- if .Values.collection.clusterLogs.enabled }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: collector
-  namespace: openshift-logging
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: logging-collector-logs-writer
-rules:
-- apiGroups:
-  - loki.grafana.com
-  resourceNames:
-  - logs
-  resources:
-  - application
-  - audit
-  - infrastructure
-  verbs:
-  - create
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: logging-collector-logs-writer
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: logging-collector-logs-writer
-subjects:
-- kind: ServiceAccount
   name: collector
   namespace: openshift-logging
 ---

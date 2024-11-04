@@ -1,0 +1,16 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  name: grafana
+  namespace: openshift-observability
+  labels:
+    dashboards: "grafana"
+spec:
+  route:
+    spec: {}
+  config:
+    security:
+      admin_user: admin
+      admin_password: admin
+{{- end }}

@@ -1,4 +1,4 @@
-{{- if .Values.collection.enabled }}
+{{- if .Values.collection.otlp.enabled }}
 # required permissions for k8sattributes processor: read namespaces, pods and replicasets
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

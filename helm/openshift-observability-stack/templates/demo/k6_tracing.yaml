@@ -26,5 +26,5 @@ spec:
         image: ghcr.io/grafana/xk6-client-tracing:v0.0.5
         env:
         - name: ENDPOINT
-          value: telemetry-collector.openshift-observability:4317
+          value: otlp-collector.openshift-observability:4317
 {{- end }}

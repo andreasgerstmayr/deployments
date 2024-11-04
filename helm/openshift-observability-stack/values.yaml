@@ -28,8 +28,8 @@ storage:
     storage:
       s3:
         bucket: tempo
-      #storageClassName: crc-csi-hostpath-provisioner # use this for CRC
-      storageClassName: gp3-csi # use this for AWS
+      storageClassName: crc-csi-hostpath-provisioner # use this for CRC
+      #storageClassName: gp3-csi # use this for AWS
 
   traces:
     enabled: true
@@ -41,15 +41,18 @@ storage:
 
 # Define telemetry collection
 collection:
-  installOperator: true
-  enabled: true
-  replicas: 1
+  otlp:
+    enabled: true
+    installOperator: true
+    replicas: 1
+
+  metrics:
+    enabled: true
 
   # Define the cluster log forwarding
   clusterLogs:
     enabled: true
-    # Available options: otel, vector
-    collector: otel
+    installOperator: true
 
 
 # Enable OpenShift Console UI Plugins
@@ -63,10 +66,15 @@ ui:
   troubleshootingPanel:
     enabled: true
 
+# Grafana
+grafana:
+  enabled: true
+  installOperator: true
 
 # Enable various demo applications
 demo:
   hotrod: true
   k6_tracing: true
   telemetrygen: true
+  prometheus: true
   petclinic: true # demo for Java auto-instrumentation

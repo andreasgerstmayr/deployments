@@ -13,6 +13,8 @@ spec:
   tenants:
     mode: openshift
     authentication:
+    - tenantName: infrastructure
+      tenantId: infrastructure
     - tenantName: application
       tenantId: application
   #observability:

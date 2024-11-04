@@ -1,0 +1,35 @@
+{{- if .Values.collection.metrics.enabled }}
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: metrics
+  namespace: openshift-observability
+spec:
+  mode: statefulset
+  targetAllocator:
+    enabled: true
+    prometheusCR:
+      enabled: true
+      serviceMonitorSelector: {}
+      podMonitorSelector: {}
+  config:
+    receivers:
+      prometheus:
+        config:
+          scrape_configs: []
+
+    exporters:
+      otlp:
+        endpoint: otlp-collector.openshift-observability:4317
+        tls:
+          insecure: true
+
+      debug:
+        verbosity: detailed
+
+    service:
+      pipelines:
+        metrics:
+          receivers: [prometheus]
+          exporters: [otlp, debug]
+{{- end }}

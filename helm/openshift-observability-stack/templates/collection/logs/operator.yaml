@@ -1,26 +1,26 @@
-{{- if .Values.collection.installOperator }}
+{{- if .Values.collection.clusterLogs.installOperator }}
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: openshift-opentelemetry-operator
+  name: openshift-logging
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: openshift-opentelemetry-operator
-  namespace: openshift-opentelemetry-operator
+  name: openshift-logging
+  namespace: openshift-logging
 spec:
   upgradeStrategy: Default
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: opentelemetry-product
-  namespace: openshift-opentelemetry-operator
+  name: cluster-logging
+  namespace: openshift-logging
 spec:
-  channel: stable
+  channel: stable-6.0
   installPlanApproval: Automatic
-  name: opentelemetry-product
+  name: cluster-logging
   source: redhat-operators
   sourceNamespace: openshift-marketplace
 {{- end }}

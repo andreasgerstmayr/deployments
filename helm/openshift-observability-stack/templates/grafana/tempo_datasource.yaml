@@ -1,0 +1,27 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: tempo-application
+  namespace: openshift-observability
+spec:
+  valuesFrom:
+  - targetPath: "secureJsonData.httpHeaderValue1"
+    valueFrom:
+      secretKeyRef:
+        name: grafana-sa
+        key: token
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  datasource:
+    type: tempo
+    name: Tempo (application tenant)
+    access: proxy
+    url: https://tempo-openshift-tracing-gateway.openshift-observability.svc.cluster.local:8080/api/traces/v1/application/tempo
+    jsonData:
+      tlsSkipVerify: true # TODO
+      httpHeaderName1: "Authorization"
+    secureJsonData:
+      httpHeaderValue1: "Bearer ${token}"
+{{- end }}

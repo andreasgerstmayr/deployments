@@ -1,4 +1,4 @@
-{{- if .Values.collection.enabled }}
+{{- if .Values.collection.otlp.enabled }}
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
@@ -6,7 +6,7 @@ metadata:
   namespace: openshift-observability
 spec:
   exporter:
-    endpoint: http://telemetry-collector.openshift-observability:4317
+    endpoint: http://otlp-collector.openshift-observability:4317
   sampler:
     type: parentbased_always_on
 {{- end }}
