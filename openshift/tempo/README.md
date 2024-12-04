@@ -39,7 +39,7 @@ kubectl apply -f ocp_tracing_plugin_latest
 
 The plugin is available in the Observe > Traces section.
 
-Note: Tempo instances with multi-tenancy are not yet supported by the tracing UI plugin. When installing the latest version, enable the plugin at: https://console-openshift-console.apps-crc.testing/k8s/cluster/operator.openshift.io~v1~Console/cluster/console-plugins
+Note: Tempo instances without multi-tenancy are not supported by the tracing UI plugin. When installing the latest version, enable the plugin at: https://console-openshift-console.apps-crc.testing/k8s/cluster/operator.openshift.io~v1~Console/cluster/console-plugins
 
 ### Perses Service Performance Monitoring dashboard
 Apply the RBAC rules:
