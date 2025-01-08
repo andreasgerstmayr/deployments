@@ -16,10 +16,10 @@ spec:
       tenantId: 1610b0c3-c509-4592-a256-a1871353dbfa
     - tenantName: user
       tenantId: 1610b0c3-c509-4592-a256-a1871353dbfb
-  #observability:
-  #  tracing:
-  #    jaeger_agent_endpoint: platform-collector.openshift-tracing:6831
-  #    sampling_fraction: "1"
+  observability:
+    tracing:
+      jaeger_agent_endpoint: platform-collector.openshift-tracing:6831
+      sampling_fraction: "1"
   template:
     gateway:
       enabled: true
@@ -27,7 +27,7 @@ spec:
       jaegerQuery:
         enabled: true
         monitorTab:
-          enabled: true 
+          enabled: true
           prometheusEndpoint: https://thanos-querier.openshift-monitoring.svc.cluster.local:9091
 
 ---
