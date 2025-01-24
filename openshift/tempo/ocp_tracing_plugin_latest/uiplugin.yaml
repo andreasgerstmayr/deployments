@@ -14,7 +14,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: list-tempo-resources
+  name: distributed-tracing-console-plugin-list-tempo-resources
 rules:
 - apiGroups: ["tempo.grafana.com"]
   resources: ["tempostacks", "tempomonolithics"]
@@ -24,14 +24,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: list-tempo-resources
+  name: distributed-tracing-console-plugin-list-tempo-resources
 subjects:
 - kind: ServiceAccount
   name: distributed-tracing-console-plugin
   namespace: distributed-tracing-console-plugin
 roleRef:
   kind: ClusterRole
-  name: list-tempo-resources
+  name: distributed-tracing-console-plugin-list-tempo-resources
   apiGroup: rbac.authorization.k8s.io
 
 ---
