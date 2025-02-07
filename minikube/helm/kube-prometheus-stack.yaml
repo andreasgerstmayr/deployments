@@ -1,0 +1,38 @@
+prometheus:
+  prometheusSpec:
+    # read prometheus rules, service monitors, pod monitors and probes from all namespaces
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+
+    enableRemoteWriteReceiver: true
+    enableFeatures:
+    - exemplar-storage
+
+grafana:
+  adminPassword: admin
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+      - name: Tempo
+        type: tempo
+        access: proxy
+        url: http://tempo-tempo1-query-frontend.tempo:3200
+        editable: false
+        uid: tempo
+        jsonData:
+          tracesToMetrics:
+            datasourceUid: prometheus
+          serviceMap:
+            datasourceUid: prometheus
+
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeEtcd:
+  enabled: false
