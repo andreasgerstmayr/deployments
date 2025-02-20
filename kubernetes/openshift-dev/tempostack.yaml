@@ -1,0 +1,85 @@
+apiVersion: tempo.grafana.com/v1alpha1
+kind:  TempoStack
+metadata:
+  name: tempo1
+  namespace: tracing
+spec:
+  storage:
+    secret:
+      name: minio
+      type: s3
+  storageSize: 1Gi
+  tenants:
+    mode: openshift
+    authentication:
+    - tenantName: platform
+      tenantId: 1610b0c3-c509-4592-a256-a1871353dbfa
+    - tenantName: user
+      tenantId: 1610b0c3-c509-4592-a256-a1871353dbfb
+  observability:
+    tracing:
+      otlp_http_endpoint: http://platform-collector:4318
+      sampling_fraction: "1"
+  template:
+    gateway:
+      enabled: true
+      rbac:
+        enabled: true
+    #queryFrontend:
+    #  jaegerQuery:
+    #    enabled: true
+    #    monitorTab:
+    #      enabled: true
+    #      prometheusEndpoint: https://thanos-querier.openshift-monitoring.svc.cluster.local:9091
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: traces-reader-platform
+rules:
+- apiGroups: [tempo.grafana.com]
+  resources: [platform]
+  resourceNames: [traces]
+  verbs: [get]
+---
+# allow any authenticated user to read traces from the 'platform' tenant in Tempo
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: traces-reader-platform
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traces-reader-platform
+subjects:
+- kind: Group
+  apiGroup: rbac.authorization.k8s.io
+  name: system:authenticated
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: traces-reader-user
+rules:
+- apiGroups: [tempo.grafana.com]
+  resources: [user]
+  resourceNames: [traces]
+  verbs: [get]
+---
+# allow any authenticated user to read traces from the 'user' tenant in Tempo
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: traces-reader-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traces-reader-user
+subjects:
+- kind: Group
+  apiGroup: rbac.authorization.k8s.io
+  name: system:authenticated

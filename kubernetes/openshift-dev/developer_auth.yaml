@@ -1,0 +1,15 @@
+# Grant the 'developer' user view permissions of the tracing-app-k6 namespace.
+# If the user cannot access any namespaces, every 'get' request will be denied: https://github.com/observatorium/opa-openshift/pull/18/files
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer-view-permissions
+  namespace: tracing-app-k6
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+- kind: User
+  name: developer
+  namespace: tracing-app-k6

@@ -1,0 +1,114 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: platform
+  namespace: tracing
+spec:
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.117.0
+  observability:
+    metrics:
+      enableMetrics: true
+  config:
+    extensions:
+      bearertokenauth:
+        filename: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+      jaeger:
+        protocols:
+          thrift_compact:
+            endpoint: 0.0.0.0:6831
+
+    connectors:
+      spanmetrics:
+        metrics_flush_interval: 5s # default: 1 min
+        dimensions:
+        - name: k8s.namespace.name
+
+    processors:
+      k8sattributes: {}
+
+    exporters:
+      otlp:
+        endpoint: tempo-tempo1-gateway.tracing.svc.cluster.local:8090
+        tls:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        auth:
+          authenticator: bearertokenauth
+        headers:
+          X-Scope-OrgID: platform
+      prometheus:
+        endpoint: 0.0.0.0:8889
+        add_metric_suffixes: false
+        resource_to_telemetry_conversion:
+          enabled: true # by default resource attributes are dropped
+
+    service:
+      extensions: [bearertokenauth]
+      pipelines:
+        traces:
+          receivers: [otlp, jaeger]
+          processors: [k8sattributes]
+          exporters: [otlp, spanmetrics]
+        metrics:
+          receivers: [spanmetrics]
+          processors: []
+          exporters: [prometheus]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tracing-platform-collector
+rules:
+- apiGroups: [""]
+  resources: ["namespaces", "pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["replicasets"]
+  verbs: ["get", "list", "watch"]
+---
+# allow platform-collector to read namespaces, pods and replicasets (required for k8sattributes processor)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tracing-platform-collector
+roleRef:
+  kind: ClusterRole
+  name: tracing-platform-collector
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: platform-collector
+  namespace: tracing
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: traces-writer-platform
+rules:
+- apiGroups: [tempo.grafana.com]
+  resources: [platform]
+  resourceNames: [traces]
+  verbs: [create]
+---
+# allow platform-collector to write traces to the 'platform' tenant in Tempo
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: traces-writer-platform
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traces-writer-platform
+subjects:
+- kind: ServiceAccount
+  name: platform-collector
+  namespace: tracing

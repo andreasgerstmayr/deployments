@@ -4,9 +4,14 @@
 IMG_PREFIX := quay.io/agerstmayr
 
 
+list:
+	@echo "Available targets:"
+	@for t in `grep -oP '^([a-zA-Z-]+)(?=:.*$$)' Makefile`; do \
+        echo "  make $$t"; done
+
 setup-dns:
 	ip r | grep 10.96.0.0 || (echo ERROR: Please start 'minikube tunnel' before. && exit 1)
-	iface=$$(ip r | grep 10.96.0.0 | awk '{print $$NF}')
+	iface=`ip r | grep 10.96.0.0 | awk '{print $$NF}'`
 	sudo resolvectl dns    $$iface 10.96.0.10
 	sudo resolvectl domain $$iface cluster.local
 
@@ -20,10 +25,13 @@ install-monitoring-stack:
 
 install-tempo-operator-dev:
 	cd ../../tempo-operator
-	eval $$(minikube docker-env)
-	IMG_PREFIX=$(IMG_PREFIX) OPERATOR_VERSION=$$(date +%s).0.0 make docker-build deploy reset
+	eval `minikube docker-env`
+	IMG_PREFIX=$(IMG_PREFIX) OPERATOR_VERSION=`date +%s`.0.0 make docker-build deploy reset
 
 install-opentelemetry-operator-dev:
 	cd ../../opentelemetry-operator
-	eval $$(minikube docker-env)
-	IMG=$(IMG_PREFIX)/opentelemetry-operator:$$(date +%s) make generate container deploy
+	eval `minikube docker-env`
+	IMG=$(IMG_PREFIX)/opentelemetry-operator:`date +%s` make generate container deploy
+
+apply:
+	kubectl apply -f .
