@@ -11,7 +11,10 @@ prometheus:
     - exemplar-storage
 
 grafana:
-  adminPassword: admin
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+      org_role: Admin
   datasources:
     datasources.yaml:
       apiVersion: 1
@@ -19,7 +22,7 @@ grafana:
       - name: Tempo
         type: tempo
         access: proxy
-        url: http://tempo-tempo1-query-frontend.tempo:3200
+        url: http://tempo-tempo1-query-frontend.tracing:3200
         editable: false
         uid: tempo
         jsonData:
