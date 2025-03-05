@@ -1,0 +1,29 @@
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: logging-loki
+  namespace: openshift-logging
+spec:
+  managementState: Managed
+  size: 1x.demo
+  storage:
+    schemas:
+    - effectiveDate: '2022-06-01'
+      version: v13
+    secret:
+      name: logging-loki-s3
+      type: s3
+  storageClassName: crc-csi-hostpath-provisioner
+  tenants:
+    mode: openshift-logging
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: logging-loki-s3
+  namespace: openshift-logging
+stringData:
+  endpoint: http://minio.minio:9000
+  bucketnames: loki
+  access_key_id: loki
+  access_key_secret: supersecret
