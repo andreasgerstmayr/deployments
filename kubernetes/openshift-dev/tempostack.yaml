@@ -23,14 +23,14 @@ spec:
   template:
     gateway:
       enabled: true
-      rbac:
-        enabled: true
-    #queryFrontend:
-    #  jaegerQuery:
+    #  rbac:
     #    enabled: true
-    #    monitorTab:
-    #      enabled: true
-    #      prometheusEndpoint: https://thanos-querier.openshift-monitoring.svc.cluster.local:9091
+    queryFrontend:
+      jaegerQuery:
+        enabled: true
+        monitorTab:
+          enabled: true
+          prometheusEndpoint: https://thanos-querier.openshift-monitoring.svc.cluster.local:9091
 
 ---
 
