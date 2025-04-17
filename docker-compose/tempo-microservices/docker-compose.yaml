@@ -81,7 +81,7 @@ services:
     - BACKEND=query-frontend:3200
 
   jaeger-query:
-    image: docker.io/jaegertracing/jaeger-query:1.62.0
+    image: docker.io/jaegertracing/jaeger-query:1.68.0
     command:
     - --query.base-path=/
     - --span-storage.type=grpc

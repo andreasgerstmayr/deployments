@@ -1,7 +1,7 @@
 apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
-  name: user
+  name: otel
   namespace: tracing
 spec:
   image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.119.0
@@ -53,7 +53,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: tracing-user-collector
+  name: tracing-otel-collector
 rules:
 - apiGroups: [""]
   resources: ["namespaces", "pods"]
@@ -62,16 +62,16 @@ rules:
   resources: ["replicasets"]
   verbs: ["get", "list", "watch"]
 ---
-# allow user-collector to read namespaces, pods and replicasets (required for k8sattributes processor)
+# allow otel-collector to read namespaces, pods and replicasets (required for k8sattributes processor)
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: tracing-user-collector
+  name: tracing-otel-collector
 roleRef:
   kind: ClusterRole
-  name: tracing-user-collector
+  name: tracing-otel-collector
   apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: ServiceAccount
-  name: user-collector
+  name: otel-collector
   namespace: tracing

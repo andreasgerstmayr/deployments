@@ -9,6 +9,10 @@ spec:
       name: minio
       type: s3
   storageSize: 1Gi
+  observability:
+    tracing:
+      otlp_http_endpoint: http://otel-collector:4318
+      sampling_fraction: "1"
   template:
     queryFrontend:
       jaegerQuery:
