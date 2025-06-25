@@ -1,0 +1,67 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  hostmetrics:
+    scrapers:
+      cpu:
+      disk:
+      load:
+      filesystem:
+      memory:
+      network:
+
+  fluentforward:
+    endpoint: 0.0.0.0:24224
+
+processors:
+  batch:
+
+  transform:
+    # loki expects container.name as a resource attribute, not an attribute
+    log_statements:
+    - context: log
+      statements:
+      - set(resource.attributes["container.name"], Trim(attributes["container_name"], "/"))
+      - delete_key(attributes, "container_name")
+      - set(resource.attributes["container.id"], attributes["container_id"])
+      - delete_key(attributes, "container_id")
+
+exporters:
+  otlp/ch:
+    endpoint: clickstack:4317
+    tls:
+      insecure: true
+
+  otlp/lgtm:
+    endpoint: lgtm:4317
+    tls:
+      insecure: true
+
+  debug:
+    verbosity: detailed
+
+extensions:
+  health_check:
+  pprof:
+  zpages:
+
+service:
+  extensions: [health_check, pprof, zpages]
+  pipelines:
+    metrics:
+      receivers: [otlp, hostmetrics]
+      processors: [batch]
+      exporters: [otlp/ch, otlp/lgtm]
+    logs:
+      receivers: [otlp, fluentforward]
+      processors: [batch, transform]
+      exporters: [otlp/ch, otlp/lgtm]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/ch, otlp/lgtm]

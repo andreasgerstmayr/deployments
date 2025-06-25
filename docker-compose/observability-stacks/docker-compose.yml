@@ -1,0 +1,33 @@
+x-logging: &logging
+  driver: fluentd
+  options:
+    fluentd-address: "127.0.0.1:24224"
+    fluentd-async: "true"
+
+services:
+  otel:
+    image: otel/opentelemetry-collector-contrib
+    volumes:
+    - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    ports:
+    - 127.0.0.1:24224:24224
+
+  k6-tracing:
+    image: ghcr.io/grafana/xk6-client-tracing:v0.0.7
+    environment:
+    - ENDPOINT=otel:4317
+    restart: always
+    logging: *logging
+
+  clickstack:
+    image: docker.hyperdx.io/hyperdx/hyperdx-local
+    ports:
+    - 8080:8080
+    logging: *logging
+
+  lgtm:
+    image: grafana/otel-lgtm
+    ports:
+    - 3000:3000
+    logging: *logging
