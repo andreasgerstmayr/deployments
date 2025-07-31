@@ -5,8 +5,6 @@ services:
     restart: always
     volumes:
       - ./tempo.yaml:/etc/tempo.yaml
-    ports:
-      - "4318:4318"   # otlp-http
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
 
@@ -144,3 +142,6 @@ services:
     image: ghcr.io/os-observability/redhat-opentelemetry-collector/redhat-opentelemetry-collector:latest
     volumes:
       - ./otel.yaml:/etc/otelcol/config.yaml
+    ports:
+      - "4317:4317"   # otlp-grpc
+      - "4318:4318"   # otlp-http
