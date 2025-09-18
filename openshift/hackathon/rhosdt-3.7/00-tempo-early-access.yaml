@@ -1,0 +1,63 @@
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+  name: tempo-idms
+spec:
+  imageDigestMirrors:
+    - source: registry.redhat.io/rhosdt/tempo-rhel8-operator
+      mirrors:
+        - quay.io/redhat-user-workloads/rhosdt-tenant/tempo/tempo-operator
+    - source: registry.redhat.io/rhosdt/tempo-rhel8
+      mirrors:
+        - quay.io/redhat-user-workloads/rhosdt-tenant/tempo/tempo
+    - source: registry.redhat.io/rhosdt/tempo-query-rhel8
+      mirrors:
+        - quay.io/redhat-user-workloads/rhosdt-tenant/tempo/tempo-query
+    - source: registry.redhat.io/rhosdt/tempo-jaeger-query-rhel8
+      mirrors:
+        - quay.io/redhat-user-workloads/rhosdt-tenant/tempo/tempo-jaeger-query
+    - source: registry.redhat.io/rhosdt/tempo-gateway-rhel8
+      mirrors:
+        - quay.io/redhat-user-workloads/rhosdt-tenant/tempo/tempo-gateway
+    - source: registry.redhat.io/rhosdt/tempo-gateway-opa-rhel8
+      mirrors:
+        - quay.io/redhat-user-workloads/rhosdt-tenant/tempo/tempo-opa
+    - source: registry.redhat.io/rhosdt/tempo-operator-bundle
+      mirrors:
+        - quay.io/redhat-user-workloads/rhosdt-tenant/tempo/tempo-bundle
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+   name: konflux-catalog-tempo
+   namespace: openshift-marketplace
+spec:
+   sourceType: grpc
+   image: quay.io/redhat-user-workloads/rhosdt-tenant/tempo/tempo-fbc-v4-19@sha256:340425fc98c2cc9cb3d75a51d78eae22b7b94035b9ca9260f1acf8684e1981df
+   displayName: Konflux Catalog Tempo
+   publisher: grpc
+---
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  name: openshift-tempo-operator
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-tempo-operator
+  namespace: openshift-tempo-operator
+spec:
+  upgradeStrategy: Default
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: tempo-product
+  namespace: openshift-tempo-operator
+spec:
+  channel: stable
+  installPlanApproval: Automatic
+  name: tempo-product
+  source: konflux-catalog-tempo
+  sourceNamespace: openshift-marketplace

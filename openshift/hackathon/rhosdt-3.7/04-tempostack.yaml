@@ -1,0 +1,51 @@
+apiVersion: tempo.grafana.com/v1alpha1
+kind:  TempoStack
+metadata:
+  name: demo
+  namespace: tempo-examples
+spec:
+  storage:
+    secret:
+      name: minio
+      type: s3
+  storageSize: 1Gi
+  tenants:
+    mode: openshift
+    authentication:
+    - tenantName: tenant1
+      tenantId: 1610b0c3-c509-4592-a256-a1871353dbfa
+    - tenantName: tenant2
+      tenantId: 1610b0c3-c509-4592-a256-a1871353dbfb
+  observability:
+    tracing:
+      otlp_http_endpoint: http://demo-collector.tempo-examples:4318
+      sampling_fraction: "1"
+  template:
+    gateway:
+      enabled: true
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: traces-reader-tenant1
+rules:
+- apiGroups: [tempo.grafana.com]
+  resources: [tenant1]
+  resourceNames: [traces]
+  verbs: [get]
+---
+# allow any authenticated user to read traces from the 'tenant1' tenant in Tempo
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: traces-reader-tenant1
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traces-reader-tenant1
+subjects:
+- kind: Group
+  apiGroup: rbac.authorization.k8s.io
+  name: system:authenticated
