@@ -66,7 +66,7 @@ func newTracerProvider() (*trace.TracerProvider, error) {
 
 	resource, err := resource.New(context.Background(),
 		resource.WithAttributes(
-			semconv.ServiceNameKey.String("tracegen"),
+			semconv.ServiceNameKey.String("tracegen-go"),
 		),
 		resource.WithHost(),
 	)

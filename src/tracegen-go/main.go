@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	tracer = otel.Tracer("tracegen")
+	tracer = otel.Tracer("tracegen-go")
 )
 
 func main() {
@@ -30,6 +30,7 @@ func run() (err error) {
 	root_spanlinks()
 	root_escaping()
 	root_k8sattrs()
+	root_attrs()
 
 	otelShutdown(ctx)
 	return nil
@@ -89,6 +90,21 @@ func root_k8sattrs() {
 		attribute.String("k8s.node.name", "ip-10-0-235-91.ec2.internal"),
 		attribute.String("k8s.deployment.name", "tempo-operator-controller"),
 		attribute.String("k8s.pod.name", "tempo-operator-controller-56b5fdf58c-4tzf6"),
+	))
+	defer span.End()
+}
+
+func root_attrs() {
+	_, span := tracer.Start(context.Background(), "span-with-attrs", trace.WithAttributes(
+		attribute.String("", ""),
+		attribute.String("string", "somevalue"),
+		attribute.String("empty-string", ""),
+		attribute.StringSlice("string-array", []string{"a", "b", "c"}),
+		attribute.StringSlice("empty-string-array", []string{}),
+		attribute.Bool("bool", true),
+		attribute.Int("int", 1),
+		attribute.Int64("int64", int64(5)),
+		attribute.Float64("float64", float64(5.1)),
 	))
 	defer span.End()
 }
