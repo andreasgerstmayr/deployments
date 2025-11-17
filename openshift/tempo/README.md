@@ -34,7 +34,7 @@ PetClinic: http://petclinic-tracing-app-petclinic.apps-crc.testing
 ```
 kubectl apply -f ocp_tracing_plugin_stable
 # or
-kubectl apply -f ocp_tracing_plugin_latest
+kubectl apply -f ocp_tracing_plugin_dev
 kubectl patch consoles.operator.openshift.io cluster --type=json -p='[{"op": "add", "path": "/spec/plugins/-", "value": "distributed-tracing-console-plugin"}]'
 ```
 
