@@ -102,6 +102,14 @@ spec:
           --header "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
           --cacert /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt \
           --data-urlencode 'q={ resource.service.name="article-service" }' \
-          https://tempo-platform-gateway.openshift-tracing.svc.cluster.local:8080/api/traces/v1/platform/tempo/api/search | jq
+          https://tempo-platform-gateway.openshift-tracing.svc.cluster.local:8080/api/traces/v1/user/tempo/api/search | jq
   restartPolicy: Never
 ```
+
+#### Run query from outside the cluster
+kubectl create serviceaccount demo
+TOKEN=$(kubectl create token demo)
+curl -G -k \
+  --header "Authorization: Bearer $TOKEN" \
+  --data-urlencode 'q={ resource.service.name="article-service" }' \
+  https://tempo-platform-gateway-openshift-tracing.apps-crc.testing/api/traces/v1/user/tempo/api/search | jq

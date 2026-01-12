@@ -27,6 +27,10 @@ querier:
   frontend_worker:
     frontend_address: query-frontend:9095
 
+query_frontend:
+  mcp_server:
+    enabled: true
+
 metrics_generator:
   registry:
     external_labels:
