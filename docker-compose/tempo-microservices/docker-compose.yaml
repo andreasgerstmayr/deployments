@@ -1,6 +1,6 @@
 services:
   distributor:
-    image: &tempoImage grafana/tempo:latest
+    image: &tempoImage grafana/tempo:2.10.1
     command: "-target=distributor -config.file=/etc/tempo.yaml"
     restart: always
     volumes:
@@ -74,7 +74,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4318
 
   tempo-query:
-    image: grafana/tempo-query:latest
+    image: grafana/tempo-query:2.10.1
     environment:
     - BACKEND=query-frontend:3200
 
