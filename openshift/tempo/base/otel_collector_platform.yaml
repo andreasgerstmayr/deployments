@@ -35,7 +35,7 @@ spec:
 
     exporters:
       otlp:
-        endpoint: tempo-platform-gateway.openshift-tracing.svc.cluster.local:8090
+        endpoint: tempo-tempo-gateway.openshift-tracing.svc.cluster.local:8090
         tls:
           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
         auth:

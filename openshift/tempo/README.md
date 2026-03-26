@@ -9,8 +9,8 @@ kubectl apply -f base
 ```
 
 ### Jaeger UI
-* `platform` tenant: https://tempo-platform-gateway-openshift-tracing.apps-crc.testing/platform
-* `user` tenant: https://tempo-platform-gateway-openshift-tracing.apps-crc.testing/user
+* `platform` tenant: https://tempo-tempo-gateway-openshift-tracing.apps-crc.testing/platform
+* `user` tenant: https://tempo-tempo-gateway-openshift-tracing.apps-crc.testing/user
 
 ## Addons
 ### Tracing Apps
@@ -56,7 +56,7 @@ mitmdump -p 9091 --mode "reverse:https://thanos-querier-openshift-monitoring.app
 
 Start a reverse proxy to access Tempo in CRC from a local Perses installation
 ```
-kubectl port-forward -n openshift-tracing svc/tempo-platform-gateway 8081:8080
+kubectl port-forward -n openshift-tracing svc/tempo-tempo-gateway 8081:8080
 mitmdump -p 3200 --mode "reverse:https://localhost:8081" --ssl-insecure \
   --modify-headers "/~q/Authorization/Bearer $(kubectl -n perses create token perses)" \
   --map-remote "|/api|/api/traces/v1/platform/tempo/api"
@@ -102,7 +102,7 @@ spec:
           --header "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
           --cacert /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt \
           --data-urlencode 'q={ resource.service.name="article-service" }' \
-          https://tempo-platform-gateway.openshift-tracing.svc.cluster.local:8080/api/traces/v1/user/tempo/api/search | jq
+          https://tempo-tempo-gateway.openshift-tracing.svc.cluster.local:8080/api/traces/v1/user/tempo/api/search | jq
   restartPolicy: Never
 ```
 
@@ -112,4 +112,4 @@ TOKEN=$(kubectl create token demo)
 curl -G -k \
   --header "Authorization: Bearer $TOKEN" \
   --data-urlencode 'q={ resource.service.name="article-service" }' \
-  https://tempo-platform-gateway-openshift-tracing.apps-crc.testing/api/traces/v1/user/tempo/api/search | jq
+  https://tempo-tempo-gateway-openshift-tracing.apps-crc.testing/api/traces/v1/user/tempo/api/search | jq
