@@ -44,7 +44,6 @@ spec:
           X-Scope-OrgID: platform
       prometheus:
         endpoint: 0.0.0.0:8889
-        add_metric_suffixes: false
         resource_to_telemetry_conversion:
           enabled: true # by default resource attributes are dropped
 

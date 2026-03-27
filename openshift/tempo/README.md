@@ -32,10 +32,7 @@ PetClinic: http://petclinic-tracing-app-petclinic.apps-crc.testing
 
 ### Tracing Plugin for OpenShift Console
 ```
-kubectl apply -f ocp_tracing_plugin_stable
-# or
-kubectl apply -f ocp_tracing_plugin_dev
-kubectl patch consoles.operator.openshift.io cluster --type=json -p='[{"op": "add", "path": "/spec/plugins/-", "value": "distributed-tracing-console-plugin"}]'
+kubectl apply -f uiplugin
 ```
 
 The plugin is available in the Observe > Traces section.
