@@ -1,0 +1,112 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: cluster-logs
+  namespace: observability
+spec:
+  mode: daemonset
+  podAnnotations:
+    openshift.io/required-scc: observability-cluster-logs-collector-scc
+  tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+    effect: NoSchedule
+  config:
+    receivers:
+      filelog:
+        include:
+        - "/var/log/pods/*/*/*.log"
+        exclude:
+        - "/var/log/pods/*/otc-container/*.log"
+        - "/var/log/pods/*/*/*.gz"
+        - "/var/log/pods/*/*/*.log.*"
+        - "/var/log/pods/*/*/*.tmp"
+        include_file_path: true
+        include_file_name: false
+        operators:
+        - type: container
+    exporters:
+      otlp:
+        endpoint: otel-collector:4317
+        tls:
+          insecure: true
+      debug:
+        verbosity: detailed
+    service:
+      pipelines:
+        logs:
+          receivers: [filelog]
+          exporters: [otlp] #, debug]
+  securityContext:
+    runAsUser: 0
+    seLinuxOptions:
+      type: spc_t
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+      - ALL
+  volumeMounts:
+  - name: varlogpods
+    mountPath: /var/log/pods
+    readOnly: true
+  volumes:
+  - name: varlogpods
+    hostPath:
+      path: /var/log/pods
+---
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: observability-cluster-logs-collector-scc
+allowPrivilegedContainer: false
+requiredDropCapabilities:
+- ALL
+allowHostDirVolumePlugin: true
+volumes:
+- configMap
+- emptyDir
+- hostPath
+- projected
+- secret
+defaultAllowPrivilegeEscalation: false
+allowPrivilegeEscalation: false
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+readOnlyRootFilesystem: true
+forbiddenSysctls:
+- '*'
+seccompProfiles:
+- runtime/default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: observability-cluster-logs-collector
+rules:
+- apiGroups:
+  - security.openshift.io
+  resourceNames:
+  - observability-cluster-logs-collector-scc
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: observability-cluster-logs-collector
+  namespace: observability
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: observability-cluster-logs-collector
+subjects:
+- kind: ServiceAccount
+  name: cluster-logs-collector
+  namespace: observability

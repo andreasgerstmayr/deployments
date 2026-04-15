@@ -1,0 +1,33 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: cluster-metrics
+  namespace: observability
+spec:
+  config:
+    receivers:
+      prometheusremotewrite:
+        endpoint: 0.0.0.0:9090
+    exporters:
+      otlp:
+        endpoint: otel-collector:4317
+        tls:
+          insecure: true
+      debug:
+        verbosity: detailed
+    service:
+      pipelines:
+        metrics:
+          receivers: [prometheusremotewrite]
+          exporters: [otlp, debug]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    prometheusK8s:
+      remoteWrite:
+      - url: "http://cluster-metrics-collector.observability:9090"
