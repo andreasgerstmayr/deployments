@@ -1,0 +1,51 @@
+apiVersion: perses.dev/v1alpha2
+kind: PersesGlobalDatasource
+metadata:
+  name: tempo-platform
+spec:
+  config:
+    display:
+      name: Tempo (platform tenant)
+    default: true
+    plugin:
+      kind: TempoDatasource
+      spec:
+        proxy:
+          kind: HTTPProxy
+          spec:
+            url: https://tempo-tempo-gateway.openshift-tracing.svc.cluster.local:8080/api/traces/v1/platform/tempo
+            headers:
+              X-Scope-OrgID: platform
+            secret: tempo-platform-secret
+  client:
+    tls:
+      enable: true
+      caCert:
+        type: file
+        certPath: /ca/service-ca.crt
+---
+apiVersion: perses.dev/v1alpha2
+kind: PersesGlobalDatasource
+metadata:
+  name: tempo-user
+spec:
+  config:
+    display:
+      name: Tempo (user tenant)
+    default: false
+    plugin:
+      kind: TempoDatasource
+      spec:
+        proxy:
+          kind: HTTPProxy
+          spec:
+            url: https://tempo-tempo-gateway.openshift-tracing.svc.cluster.local:8080/api/traces/v1/user/tempo
+            headers:
+              X-Scope-OrgID: user
+            secret: tempo-user-secret
+  client:
+    tls:
+      enable: true
+      caCert:
+        type: file
+        certPath: /ca/service-ca.crt

@@ -30,36 +30,14 @@ kubectl apply -f auto_instrumentation
 
 PetClinic: http://petclinic-tracing-app-petclinic.apps-crc.testing
 
-### Tracing Plugin for OpenShift Console
+### OpenShift Console Plugins
 ```
-kubectl apply -f uiplugin
+kubectl apply -f ocp_console
 ```
 
 The plugin is available in the Observe > Traces section.
 
 Note: Tempo instances without multi-tenancy are not supported by the tracing UI plugin.
-
-### Perses Service Performance Monitoring dashboard
-Apply the RBAC rules:
-```
-kubectl apply -f perses/rbac.yaml
-```
-
-Start a reverse proxy to access Thanos querier in CRC from a local Perses installation
-```
-mitmdump -p 9091 --mode "reverse:https://thanos-querier-openshift-monitoring.apps-crc.testing" --ssl-insecure \
-  --modify-headers "/~q/Authorization/Bearer $(kubectl -n perses create token perses)"
-```
-
-Start a reverse proxy to access Tempo in CRC from a local Perses installation
-```
-kubectl port-forward -n openshift-tracing svc/tempo-tempo-gateway 8081:8080
-mitmdump -p 3200 --mode "reverse:https://localhost:8081" --ssl-insecure \
-  --modify-headers "/~q/Authorization/Bearer $(kubectl -n perses create token perses)" \
-  --map-remote "|/api|/api/traces/v1/platform/tempo/api"
-```
-
-Open Perses and import the dashboards from the [perses/dashboards](perses/dashboards) folder.
 
 ## curl
 ### Ingest Traces using telemetrygen
