@@ -5,4 +5,4 @@ metadata:
   namespace: tracing-app-petclinic
 spec:
   exporter:
-    endpoint: http://user-collector.openshift-tracing:4317
+    endpoint: http://user-collector.tracing:4317

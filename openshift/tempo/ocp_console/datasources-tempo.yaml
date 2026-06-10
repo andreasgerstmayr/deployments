@@ -13,7 +13,7 @@ spec:
         proxy:
           kind: HTTPProxy
           spec:
-            url: https://tempo-tempo-gateway.openshift-tracing.svc.cluster.local:8080/api/traces/v1/platform/tempo
+            url: https://tempo-tempo-gateway.tracing.svc.cluster.local:8080/api/traces/v1/platform/tempo
             headers:
               X-Scope-OrgID: platform
             secret: tempo-platform-secret
@@ -39,7 +39,7 @@ spec:
         proxy:
           kind: HTTPProxy
           spec:
-            url: https://tempo-tempo-gateway.openshift-tracing.svc.cluster.local:8080/api/traces/v1/user/tempo
+            url: https://tempo-tempo-gateway.tracing.svc.cluster.local:8080/api/traces/v1/user/tempo
             headers:
               X-Scope-OrgID: user
             secret: tempo-user-secret

@@ -2,7 +2,7 @@ apiVersion: perses.dev/v1alpha2
 kind: PersesDashboard
 metadata:
   name: tracing-detail
-  namespace: openshift-tracing
+  namespace: tracing
 spec:
   config:
     display:

@@ -2,7 +2,7 @@ apiVersion: tempo.grafana.com/v1alpha1
 kind:  TempoStack
 metadata:
   name: tempo
-  namespace: openshift-tracing
+  namespace: tracing
 spec:
   storage:
     secret:
@@ -18,7 +18,7 @@ spec:
       tenantId: 1610b0c3-c509-4592-a256-a1871353dbfb
   observability:
     tracing:
-      otlp_http_endpoint: http://platform-collector.openshift-tracing:4318
+      otlp_http_endpoint: http://platform-collector.tracing:4318
       sampling_fraction: "1"
   template:
     gateway:

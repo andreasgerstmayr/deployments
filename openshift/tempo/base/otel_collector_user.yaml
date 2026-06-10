@@ -2,7 +2,7 @@ apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: user
-  namespace: openshift-tracing
+  namespace: tracing
 spec:
   observability:
     metrics:
@@ -35,7 +35,7 @@ spec:
 
     exporters:
       otlp:
-        endpoint: tempo-tempo-gateway.openshift-tracing.svc.cluster.local:8090
+        endpoint: tempo-tempo-gateway.tracing.svc.cluster.local:8090
         tls:
           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
         auth:
@@ -62,7 +62,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: openshift-tracing-user-collector
+  name: tracing-user-collector
 rules:
 - apiGroups: [""]
   resources: ["namespaces", "pods"]
@@ -75,15 +75,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: openshift-tracing-user-collector
+  name: tracing-user-collector
 roleRef:
   kind: ClusterRole
-  name: openshift-tracing-user-collector
+  name: tracing-user-collector
   apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: ServiceAccount
   name: user-collector
-  namespace: openshift-tracing
+  namespace: tracing
 
 ---
 
@@ -109,4 +109,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: user-collector
-  namespace: openshift-tracing
+  namespace: tracing
