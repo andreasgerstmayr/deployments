@@ -28,7 +28,7 @@ spec:
               value: {{ .Values.storage.s3.access_key_id }}
             - name: MINIO_SECRET_KEY
               value: {{ .Values.storage.s3.access_key_secret }}
-          image: minio/minio
+          image: quay.io/minio/minio
           name: minio
           ports:
             - containerPort: 9000

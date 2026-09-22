@@ -1,6 +1,6 @@
 services:
   distributor:
-    image: &tempoImage grafana/tempo:2.10.1
+    image: &tempoImage grafana/tempo:2.10.8
     command: "-target=distributor -config.file=/etc/tempo.yaml"
     restart: always
     volumes:
@@ -89,7 +89,7 @@ services:
     - "16686:16686"
 
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     environment:
       - MINIO_ACCESS_KEY=tempo
       - MINIO_SECRET_KEY=supersecret
